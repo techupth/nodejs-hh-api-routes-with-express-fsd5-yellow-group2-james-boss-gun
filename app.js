@@ -72,3 +72,53 @@ app.delete('/assignments/:id', (req, res) => {
 
 })
 
+// edit existing assignment
+app.put('/assignments/:id', (req, res) => {
+  const indextoModify = assignments.findIndex(assignment => assignment.id === Number(req.params.id));
+  const { title, description, categories } = req.body;
+
+  if (indextoModify != -1) {
+    assignments[indextoModify] = { id: assignments[indextoModify].id, title, categories, description }
+    res.json({
+      message: `Assignment Id : ${req.params.id}  has been updated successfully`,
+      data: assignments[indextoModify],
+    })
+
+  }
+  else {
+    res.status(404).json({
+      message: "Cannot update, No data available!"
+    })
+
+  }
+})
+
+// Get all comments associated with an assignment.
+app.get('/assignments/:id/comments', (req, res) => {
+  const allComments = comments.filter(comment => comment.assignmentId === Number(req.params.id))
+  res.json({
+    message: "Complete fetching comments",
+    data: allComments
+  })
+})
+
+
+// Post a new comment to an assignment
+app.post('/assignments/:id/comments', (req, res) => {
+  const { assignmentId, content } = req.body;
+  const newId = (comments[comments.length - 1].id + 1) || 1;
+
+  const newComment = {
+    id: newId,
+    assignmentId: Number(assignmentId),
+    content
+  }
+  comments.push(newComment);
+
+  res.json({
+    message: "New comment has been created successfully",
+    data: newComment,
+  })
+
+
+})
