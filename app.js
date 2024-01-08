@@ -12,14 +12,15 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/assignments", (req, res) => {
   const limit = req.query.limit;
-  if (limit > 5) {
+  if (limit > 10) {
     return res.status(401).json({
-      message: "Invalid request. Can fetch up to 5 assignments per request",
+      message: "Invalid request,limit must not exceeds 10 assignments",
     });
   }
   const assignmentsWithLimit = assignmentsMockDatabase.slice(0, limit);
 
   return res.json({
+    message: "Complete Fetching assignments",
     data: assignmentsWithLimit,
   });
 });
@@ -31,6 +32,7 @@ app.get("/assignments/:assignmentsId", (req, res) => {
   );
 
   return res.json({
+    message: "Complete Fetching assignments",
     data: assignmentsData[0],
   });
 });
@@ -41,7 +43,8 @@ app.post("/assignments", (req, res) => {
     ...req.body,
   });
   return res.json({
-    message: "Assignment has been created successfully",
+    message: "New assignment has been created successfully",
+    data: assignmentsMockDatabase[assignmentsMockDatabase.length - 1],
   });
 });
 
@@ -57,19 +60,30 @@ app.put("/assignments/:assignmentsId", (req, res) => {
   };
 
   return res.json({
-    message: "Assignment has been updated successfully",
+    message: `Assignment Id : ${assignmentsFromClient}  has been updated successfully`,
+    data: assignmentsMockDatabase[assignmentsIndex],
   });
 });
 
 app.delete("/assignments/:assignmentsId", (req, res) => {
   let assignmentsFromClient = Number(req.params.assignmentsId);
 
+  const assignmentToDelete = assignmentsMockDatabase.find((item) => {
+    return item.id === assignmentsFromClient;
+  });
+
+  if (!assignmentToDelete) {
+    return res.status(404).json({
+      message: `Cannot delete assignment with id: ${assignmentsFromClient}, No data available!`,
+    });
+  }
+
   const newAssignments = assignmentsMockDatabase.filter((item) => {
     return item.id !== assignmentsFromClient;
   });
   assignmentsMockDatabase = newAssignments;
   return res.json({
-    message: "Assignment has been deleted successfully",
+    message: `Assignment Id : ${assignmentsFromClient}  has been deleted successfully`,
   });
 });
 
