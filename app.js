@@ -38,10 +38,23 @@ app.get("/assignments/:assignmentsId", (req, res) => {
 });
 
 app.post("/assignments", (req, res) => {
+  if (!req.body.description) {
+    return res.json({
+      message:
+        "Description not found, please give description to create assignment",
+    });
+  }
+
+  if (!req.body.title) {
+    return res.json({
+      message: "Title not found, please give title to create assignment",
+    });
+  }
   assignmentsMockDatabase.push({
     id: assignmentsMockDatabase[assignmentsMockDatabase.length - 1].id + 1,
     ...req.body,
   });
+
   return res.json({
     message: "New assignment has been created successfully",
     data: assignmentsMockDatabase[assignmentsMockDatabase.length - 1],
@@ -50,6 +63,26 @@ app.post("/assignments", (req, res) => {
 
 app.put("/assignments/:assignmentsId", (req, res) => {
   let assignmentsFromClient = Number(req.params.assignmentsId);
+  const assignmentToUpdate = assignmentsMockDatabase.find((item) => {
+    return item.id === assignmentsFromClient;
+  });
+  if (!assignmentToUpdate) {
+    return res.status(404).json({
+      message: `Cannot update with id: ${assignmentsFromClient} , No data available!`,
+    });
+  }
+  if (!req.body.description) {
+    return res.json({
+      message:
+        "Description not found, please give description to create assignment",
+    });
+  }
+
+  if (!req.body.title) {
+    return res.json({
+      message: "Title not found, please give title to create assignment",
+    });
+  }
   const assignmentsIndex = assignmentsMockDatabase.findIndex((item) => {
     return item.id === assignmentsFromClient;
   });
